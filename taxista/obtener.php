@@ -5,28 +5,42 @@ header("Content-Type: application/json");
 include "../config/conexion.php";
 include "../utils/response.php";
 
+$id_taxista = $_GET['id_taxista'];
+
 $sql = "SELECT
             t.id_taxista,
             t.nombre,
             t.dni,
             t.telefono,
+
             v.placa,
             v.modelo,
+            v.color,
+
             n.codigo_nfc
+
         FROM taxistas t
+
         LEFT JOIN vehiculos v
             ON t.id_taxista = v.id_taxista
+
         LEFT JOIN tarjetas_nfc n
-            ON t.id_taxista = n.id_taxista";
+            ON t.id_taxista = n.id_taxista
+
+        WHERE t.id_taxista = '$id_taxista'";
 
 $result = $conn->query($sql);
 
-$data = [];
+if($result->num_rows > 0){
 
-while($row = $result->fetch_assoc()){
-    $data[] = $row;
+    $data = $result->fetch_assoc();
+
+    response(true, "Taxista encontrado", $data);
+
+}else{
+
+    response(false, "No encontrado");
+
 }
-
-response(true,"Lista de taxistas",$data);
 
 ?>
