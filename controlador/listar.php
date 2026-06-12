@@ -17,7 +17,6 @@ $sql = "SELECT
             c.id_controlador,
             c.nombre,
             c.codigo_unico,
-            c.tipo,
             c.estado,
             p.nombre AS paradero
         FROM controladores c

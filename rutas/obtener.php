@@ -10,7 +10,7 @@ $id_ruta = $_GET['id_ruta'] ?? '';
 if(empty($id_ruta)){
     response(false, "ID requerido");
     exit;
-}
+} 
 
 $sql = "SELECT * FROM rutas WHERE id_ruta = ?";
 

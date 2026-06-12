@@ -31,11 +31,19 @@ $sql = "SELECT
             u.usuario,
             u.password,
             u.estado,
+            u.id_controlador,
+            c.nombre AS controlador,
+            c.id_paradero,
             r.id_rol,
-            r.nombre AS rol
+            r.nombre AS rol,
+            p.nombre AS paradero
         FROM usuarios u
         INNER JOIN roles r 
         ON u.id_rol = r.id_rol
+        LEFT JOIN controladores c
+        ON u.id_controlador = c.id_controlador
+        LEFT JOIN paraderos p
+        ON c.id_paradero = p.id_paradero
         WHERE u.usuario = ?";
 
 $stmt = $conn->prepare($sql);
@@ -51,7 +59,6 @@ if($result->num_rows > 0){
     $row = $result->fetch_assoc();
 
     if(password_verify($password, $row['password'])){
-//    if($password == $row['password']){
 
         if($row['estado'] == 0){
 

@@ -14,7 +14,6 @@ $id = $data['id_controlador'] ?? 0;
 $nombre = $data['nombre'] ?? '';
 $codigo_unico = $data['codigo_unico'] ?? '';
 $id_paradero = $data['id_paradero'] ?? '';
-$tipo = $data['tipo'] ?? '';
 $estado = $data['estado'] ?? 1;
 
 $sql = "UPDATE controladores
@@ -22,18 +21,16 @@ SET
 nombre = ?,
 codigo_unico = ?,
 id_paradero = ?,
-tipo = ?,
 estado = ?
 WHERE id_controlador = ?";
 
 $stmt = $conn->prepare($sql);
 
 $stmt->bind_param(
-    "ssisii",
+    "ssiii",
     $nombre,
     $codigo_unico,
     $id_paradero,
-    $tipo,
     $estado,
     $id
 );

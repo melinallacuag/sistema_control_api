@@ -1,22 +1,57 @@
 <?php
 
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 include "../config/conexion.php";
 include "../utils/response.php";
 
-$nombre = $_POST['nombre'];
-$dni = $_POST['dni'];
-$telefono = $_POST['telefono'];
+$data = json_decode(file_get_contents("php://input"), true);
 
-$placa = $_POST['placa'];
-$modelo = $_POST['modelo'];
-$color = $_POST['color'];
+$nombre = $data['nombre'] ?? '';
+$dni = $data['dni'] ?? '';
+$telefono = $data['telefono'] ?? '';
 
-$codigo_nfc = $_POST['codigo_nfc'];
+$placa = $data['placa'] ?? '';
+$modelo = $data['modelo'] ?? '';
+$color = $data['color'] ?? '';
 
-$sql = "INSERT INTO taxistas(nombre,dni,telefono,estado)
-        VALUES('$nombre','$dni','$telefono',1)";
+$codigo_nfc = $data['codigo_nfc'] ?? '';
 
-if($conn->query($sql)){
+if (
+    empty($nombre) ||
+    empty($dni) ||
+    empty($placa) ||
+    empty($codigo_nfc)
+) {
+    response(false, "Complete los campos obligatorios");
+    exit;
+}
+
+$sql = "INSERT INTO taxistas(
+            nombre,
+            dni,
+            telefono,
+            estado
+        ) VALUES (?, ?, ?, 1)";
+
+$stmt = $conn->prepare($sql);
+
+$stmt->bind_param(
+    "sss",
+    $nombre,
+    $dni,
+    $telefono
+);
+
+if ($stmt->execute()) {
 
     $id_taxista = $conn->insert_id;
 
@@ -26,33 +61,40 @@ if($conn->query($sql)){
                         color,
                         id_taxista,
                         estado
-                    )
-                    VALUES(
-                        '$placa',
-                        '$modelo',
-                        '$color',
-                        '$id_taxista',
-                        1
-                    )";
+                    ) VALUES (?, ?, ?, ?, 1)";
 
-    $conn->query($sqlVehiculo);
+    $stmtVehiculo = $conn->prepare($sqlVehiculo);
+
+    $stmtVehiculo->bind_param(
+        "sssi",
+        $placa,
+        $modelo,
+        $color,
+        $id_taxista
+    );
+
+    $stmtVehiculo->execute();
 
     $sqlNfc = "INSERT INTO tarjetas_nfc(
                     codigo_nfc,
                     id_taxista,
                     estado
-                )
-                VALUES(
-                    '$codigo_nfc',
-                    '$id_taxista',
-                    1
-                )";
+                ) VALUES (?, ?, 1)";
 
-    $conn->query($sqlNfc);
+    $stmtNfc = $conn->prepare($sqlNfc);
+
+    $stmtNfc->bind_param(
+        "si",
+        $codigo_nfc,
+        $id_taxista
+    );
+
+    $stmtNfc->execute();
 
     response(true, "Registro completo");
 
-}else{
+} else {
+
     response(false, "Error al registrar");
+
 }
-?>

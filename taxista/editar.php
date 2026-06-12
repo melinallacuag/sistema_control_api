@@ -1,21 +1,27 @@
 <?php
 
 header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: PUT");
+header("Access-Control-Allow-Headers: Content-Type");
 
 include "../config/conexion.php";
 include "../utils/response.php";
 
-$id_taxista = $_POST['id_taxista'];
+$data = json_decode(file_get_contents("php://input"), true);
 
-$nombre = $_POST['nombre'];
-$dni = $_POST['dni'];
-$telefono = $_POST['telefono'];
 
-$placa = $_POST['placa'];
-$modelo = $_POST['modelo'];
-$color = $_POST['color'];
+$id_taxista = $data['id_taxista'];
 
-$codigo_nfc = $_POST['codigo_nfc'];
+$nombre = $data['nombre'];
+$dni = $data['dni'];
+$telefono = $data['telefono'];
+
+$placa = $data['placa'];
+$modelo = $data['modelo'];
+$color = $data['color'];
+
+$codigo_nfc = $data['codigo_nfc'];
 
 
 // =========================
